@@ -4,11 +4,12 @@ import numpy as np
 from tqdm import tqdm
 
 img = Image.fromarray(img)
-in_pixels = int(dpi * 0.39 * field_size)
+in_pixels = dpi * 0.39 * field_size
 pix = img.load()
 bounds = getBounds(img, in_pixels)
 
 print(bounds)
+print(int(img.size[0] / in_pixels))
 matrix = list()
 clusters = list()
 for i in tqdm(range(int(img.size[0] / in_pixels)), position=0, desc="col", leave=False,):
@@ -21,5 +22,4 @@ for i in tqdm(range(int(img.size[0] / in_pixels)), position=0, desc="col", leave
         cell = Cell(crop, i, j)
         cell.cluster_analysis()
         clusters.append(cell)
-clusters.append(cell)
 clusters = sorted(clusters, key=lambda cell: (cell.cluster, cell.sigma))

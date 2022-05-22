@@ -9,6 +9,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class CanvasModel {
     private Waffler waffler;
     private double scale = 1.0;
@@ -18,12 +21,14 @@ public class CanvasModel {
     private double blockSize = 1200 * 0.39 * gridStep;
     private double[] bounds;
 
+    public ArrayList<Point2D> point2DS = new ArrayList<>();
+
 
     public CanvasModel(Image image){
         this.waffler = new Waffler(image);
         bounds = new double[]{
-                (image.getWidth() - (int)((image.getWidth() / blockSize))* blockSize ) / 2,
-                (image.getHeight() - (int)((image.getHeight() / blockSize))* blockSize) / 2
+                (image.getWidth() - (int)(image.getWidth() / blockSize) * blockSize) / 2,
+                (image.getHeight() - (int)(image.getHeight() / blockSize) * blockSize) / 2
         };
     }
 
@@ -47,8 +52,8 @@ public class CanvasModel {
         gridStep = mm / 100;
         blockSize = 1200 * 0.39 * gridStep;
         Image image = getImage();
-        bounds[0] = (image.getWidth() - (int)((image.getWidth() / blockSize))* blockSize ) / 2;
-        bounds[1] = (image.getHeight() - (int)((image.getHeight() / blockSize))* blockSize) / 2;
+        bounds[0] = (image.getWidth() - (int)(image.getWidth() / blockSize) * blockSize) / 2;
+        bounds[1] = (image.getHeight() - (int)(image.getHeight() / blockSize) * blockSize) / 2;
     }
 
     public void setScale(double value){
@@ -68,14 +73,27 @@ public class CanvasModel {
         if (selectedCell != null){
             drawSelected(context);
         }
+        drawInteresting(context);
         context.restore();
     }
 
     private void drawSelected(GraphicsContext context){
         context.save();
         context.setLineWidth(3);
-        context.setStroke(Color.RED);
+        context.setStroke(Color.ORANGE);
         drawRect(context, (int) selectedCell.getX(), (int) selectedCell.getY(), bounds, blockSize, 5);
+        context.restore();
+    }
+
+    private void drawInteresting(GraphicsContext context){
+        context.save();
+        context.setLineWidth(5);
+        context.setStroke(Color.RED);
+        point2DS.forEach(point2D -> {
+            System.out.println("draw this");
+            System.out.println(point2D);
+            drawRect(context, (int) point2D.getX(), (int) point2D.getY(), bounds, blockSize, 5);
+        });
         context.restore();
     }
 

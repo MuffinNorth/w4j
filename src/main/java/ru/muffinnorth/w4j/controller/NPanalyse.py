@@ -23,8 +23,10 @@ def zbuffer(p, o):
     return math.sqrt(x + y + z)
 
 def getBounds(img, in_pixels):
-    return (int((img.size[0] - int(img.size[0] / in_pixels) * in_pixels) / 2),
-            int((img.size[1] - int(img.size[1] / in_pixels) * in_pixels) / 2))
+    return (
+        (img.size[0] - int(img.size[0] / in_pixels)*in_pixels) / 2,
+        (img.size[1] - int(img.size[1] / in_pixels)*in_pixels) / 2
+    )
 
 class Cell:
     CELL_SIZE = 13

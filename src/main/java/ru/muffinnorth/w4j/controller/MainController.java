@@ -1,6 +1,7 @@
 package ru.muffinnorth.w4j.controller;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -88,7 +89,6 @@ public class MainController {
         });*/
 
         findButton.setOnAction(actionEvent -> {
-            Thread t = new Thread(() -> {
                 System.out.println("run thread");
                 try(Interpreter pyInterp = new SharedInterpreter()) {
                     File npAnalyser = new File("src/main/java/ru/muffinnorth/w4j/controller/NPanalyse.py");
@@ -108,16 +108,19 @@ public class MainController {
                     }
                     NDArray<int[]> nd = new NDArray<>(pixels, (int)model.getImage().getWidth(), (int)model.getImage().getHeight());
                     pyInterp.set("img", nd);
-
                     System.out.println("run analyse");
                     pyInterp.runScript(cluster.getAbsolutePath());
-                    System.out.println(pyInterp.getValue("clusters"));
+
+                    for (int j = 0; j < 15; j++) {
+                        pyInterp.exec("cell = clusters[-%d]".formatted(j));
+                        Long y = (Long) pyInterp.getValue("cell.x");
+                        Long x = (Long) pyInterp.getValue("cell.y");
+                        model.point2DS.add(new Point2D(x,y));
+                    }
+                    System.out.println(Arrays.toString(model.point2DS.toArray()));
+                    draw();
                 }
-            });
-            t.start();
             closeButton.setOnAction(actionEvent1 -> {
-                System.out.println("stop");
-                t.stop();
             });
         });
 
