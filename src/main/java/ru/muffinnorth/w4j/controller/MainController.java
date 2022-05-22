@@ -1,19 +1,22 @@
 package ru.muffinnorth.w4j.controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
-import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import jep.Interpreter;
+import jep.JepConfig;
+import jep.NDArray;
+import jep.SharedInterpreter;
+import ru.muffinnorth.w4j.model.CanvasModel;
 
-import java.io.File;
+import java.io.*;
+import java.util.Arrays;
 
 public class MainController {
 
@@ -30,6 +33,9 @@ public class MainController {
     TextField scaleField;
 
     @FXML
+    Button findButton;
+
+    @FXML
     ToggleButton gridToggle;
 
     @FXML
@@ -38,91 +44,141 @@ public class MainController {
     @FXML
     ComboBox<String> gridSizeComboBox;
 
-    Image image;
+    @FXML
+    Label selectedCoordinateLabel;
 
-    int jCanvas;
-    int iCanvas;
+    @FXML
+    Label outLabel;
+
+    @FXML
+    Button closeButton;
+
+    private CanvasModel model;
 
     @FXML
     private void onClickLoadButton(){
-        Stage thisStage = (Stage) loadButton.getScene().getWindow();
-        FileChooser filechooser = new FileChooser();
-        filechooser.setTitle("Open File");
-        File selected = filechooser.showOpenDialog(thisStage);
-        image = new Image(selected.getAbsolutePath());
+        {
+            Stage thisStage = (Stage) loadButton.getScene().getWindow();
+            FileChooser filechooser = new FileChooser();
+            filechooser.setTitle("Open File");
+            File selected = filechooser.showOpenDialog(thisStage);
+            model = new CanvasModel(new Image(selected.getAbsolutePath()));
+        }
+        prepare();
+        init();
+        connectListener();
+        draw();
 
-        gridSizeComboBox.getItems().add("20");
-        gridSizeComboBox.getSelectionModel().select(0);
-        gridSizeComboBox.getItems().add("40");
+        /*findButton.setOnAction(actionEvent -> {
+            try(Interpreter interpreter = new SharedInterpreter()){
+                PixelReader reader = model.getImage().getPixelReader();
+                int[] pixels = new int[(int) (model.getImage().getHeight()*model.getImage().getWidth())];
+                int i = 0;
+                for (int x = 0; x < model.getImage().getWidth(); x++) {
+                    for (int y = 0; y < model.getImage().getHeight(); y++) {
+                        pixels[i] = (int) (reader.getColor(x, y).grayscale().getRed()*255);
+                        i++;
+                    }
+                }
+                System.out.println(Arrays.toString(pixels));
+                NDArray<int[]> nd = new NDArray<>(pixels, (int)model.getImage().getWidth(), (int)model.getImage().getHeight());
+                interpreter.set("inp", nd);
+                System.out.println(interpreter.getValue("inp.shape"));
+            }
+        });*/
 
-        gridSizeComboBox.getSelectionModel().selectedItemProperty().addListener((observableValue, integer, t1) -> {
-            drawImage();
+        findButton.setOnAction(actionEvent -> {
+            Thread t = new Thread(() -> {
+                System.out.println("run thread");
+                try(Interpreter pyInterp = new SharedInterpreter()) {
+                    File npAnalyser = new File("src/main/java/ru/muffinnorth/w4j/controller/NPanalyse.py");
+                    File cluster = new File("src/main/java/ru/muffinnorth/w4j/controller/Cluster.py");
+                    pyInterp.runScript(npAnalyser.getAbsolutePath());
+                    pyInterp.exec("field_size = 0.2");
+                    pyInterp.exec("dpi = 1200");
+
+                    PixelReader reader = model.getImage().getPixelReader();
+                    int[] pixels = new int[(int) (model.getImage().getHeight()*model.getImage().getWidth())];
+                    int i = 0;
+                    for (int x = 0; x < model.getImage().getWidth(); x++) {
+                        for (int y = 0; y < model.getImage().getHeight(); y++) {
+                            pixels[i] = (int) (reader.getColor(x, y).grayscale().getRed()*255);
+                            i++;
+                        }
+                    }
+                    NDArray<int[]> nd = new NDArray<>(pixels, (int)model.getImage().getWidth(), (int)model.getImage().getHeight());
+                    pyInterp.set("img", nd);
+
+                    System.out.println("run analyse");
+                    pyInterp.runScript(cluster.getAbsolutePath());
+                    System.out.println(pyInterp.getValue("clusters"));
+                }
+            });
+            t.start();
+            closeButton.setOnAction(actionEvent1 -> {
+                System.out.println("stop");
+                t.stop();
+            });
         });
 
+    }
 
+    private void connectListener(){
+        scaleSlider.valueProperty().addListener((observableValue, number, t1) -> {
+            model.setScale(t1.doubleValue());
+            scaleField.setText(String.format("%.2f", t1.doubleValue()));
+            draw();
+        });
 
-        canvas.setOnScroll(scrollEvent -> {
-            if(scrollEvent.isControlDown()){
-                System.out.println("Hello");
-                if(scrollEvent.getDeltaY() < 0){
-                    if(scaleSlider.getValue() >= 0.05)
-                        scaleSlider.valueProperty().setValue(scaleSlider.getValue() - 0.01);
-                }else {
-                    scaleSlider.valueProperty().setValue(scaleSlider.getValue() + 0.01);
-                }
+        gridToggle.setOnAction(actionEvent -> {
+            model.setNeedGrid(gridToggle.isSelected());
+            draw();
+        });
+
+        gridSizeComboBox.getSelectionModel().selectedItemProperty().addListener((observableValue, sold, snew) -> {
+            try {
+                double dnew = Double.parseDouble(snew);
+                model.setGridStep(dnew);
+                draw();
+            } catch (NumberFormatException ex){
+                gridSizeComboBox.getSelectionModel().select(sold);
             }
         });
 
+        canvas.setOnMouseClicked(model.getCoordinateListener(
+                () -> {
+                    draw();
+                    cellView.setImage(model.getSelectedImage());
+                    selectedCoordinateLabel.setText(String.format("X:%d Y:%d",
+                            (int) model.getSelectedCell().getX(),
+                            (int) model.getSelectedCell().getY()));
+                }
+        ));
+    }
 
+    private void prepare(){
+        scaleSlider.valueProperty().setValue(1.0);
+        scaleField.setText("1.00");
+        gridToggle.setSelected(false);
+        gridSizeComboBox.getItems().clear();
+        gridSizeComboBox.getItems().addAll("20", "40");
+        gridSizeComboBox.getSelectionModel().select(0);
+    }
 
+    private void init(){
+        model.setGridStep(
+                Double.parseDouble(gridSizeComboBox.getSelectionModel().getSelectedItem())
+        );
+    }
 
-        scaleSlider.valueProperty().addListener((observableValue, number, t1) -> {
-            scaleField.setText(number.toString());
-            drawImage();
-        });
-        drawImage();
+    private void draw(){
+        canvas.setWidth(model.getWidth());
+        canvas.setHeight(model.getHeight());
+        canvas.getGraphicsContext2D().clearRect(0,0, model.getHeight(), model.getWidth());
+        model.draw(canvas.getGraphicsContext2D());
     }
 
     @FXML
     private void onScaleChange(){
-        drawImage();
-    }
-
-    @FXML
-    private void drawImage(){
-        canvas.getGraphicsContext2D().save();
-        Double scale = scaleSlider.getValue();
-        canvas.setHeight(image.getHeight()*scale);
-        canvas.setWidth(image.getWidth()*scale);
-        canvas.getGraphicsContext2D().scale(scale,scale);
-        canvas.getGraphicsContext2D().drawImage(image, 0, 0);
-        Double grid = Double.parseDouble(gridSizeComboBox.getSelectionModel().getSelectedItem()) / 100;
-        Double blockSize = 1200 * 0.39 * grid;
-        Double boundsX = (image.getWidth() - (int)((image.getWidth() / blockSize))*blockSize ) / 2;
-        Double boundsY = (image.getHeight() - (int)((image.getHeight() / blockSize))*blockSize) / 2;
-
-        canvas.setOnMouseClicked(mouseEvent -> {
-            iCanvas = Math.abs((int) ( (boundsX - mouseEvent.getX() / scale) / blockSize ));
-            jCanvas = Math.abs((int) ( (boundsY - mouseEvent.getY() / scale) / blockSize ));
-            drawImage();
-            PixelReader reader = image.getPixelReader();
-            WritableImage newImage = new WritableImage(reader, (int)(boundsX + iCanvas * blockSize),
-                    (int)(boundsY + jCanvas * blockSize), (int)Math.round(blockSize), (int)Math.round(blockSize));
-            cellView.setImage(newImage);
-        });
-
-        canvas.getGraphicsContext2D().setLineWidth(2);
-        canvas.getGraphicsContext2D().setStroke(Color.BLACK);
-        if(gridToggle.isSelected()){
-            for (int i = 0; i < (image.getWidth() / blockSize) - 1; i++) {
-                for (int j = 0; j < (image.getHeight() / blockSize) - 1; j++) {
-                    canvas.getGraphicsContext2D().setStroke(Color.BLACK);
-                    if(i == iCanvas && j == jCanvas)
-                        canvas.getGraphicsContext2D().setStroke(Color.ORANGE);
-                    canvas.getGraphicsContext2D().strokeRect(  boundsX + i*blockSize + 5, boundsY + j*blockSize + 5, blockSize - 5, blockSize - 5);
-                }
-            }
-        }
-        canvas.getGraphicsContext2D().restore();
     }
 }

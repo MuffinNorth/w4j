@@ -10,7 +10,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="491.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.muffinnorth.w4j.controller.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="624.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.muffinnorth.w4j.controller.MainController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -47,68 +47,94 @@
       </ScrollPane>
    </center>
    <left>
-      <Accordion BorderPane.alignment="CENTER">
+      <Accordion minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
         <panes>
           <TitledPane text="Обработка ">
                <content>
                   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <Button fx:id="loadButton" mnemonicParsing="false" onAction="#onClickLoadButton" text="Загрузить скан" />
+                        <Button fx:id="loadButton" mnemonicParsing="false" onAction="#onClickLoadButton" prefHeight="31.0" prefWidth="184.0" text="Загрузить скан" />
                         <Separator prefWidth="200.0">
                            <padding>
                               <Insets bottom="10.0" top="10.0" />
                            </padding>
                         </Separator>
+                        <HBox>
+                           <children>
+                              <Label prefHeight="21.0" prefWidth="177.0" text="Сетка:" textAlignment="CENTER" />
+                           </children>
+                        </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Label text="Сетка:" textAlignment="CENTER">
+                              <Label prefHeight="21.0" prefWidth="37.0" text="Шаг:" textAlignment="CENTER" />
+                              <ComboBox fx:id="gridSizeComboBox" editable="true" prefHeight="31.0" prefWidth="76.0" promptText="шаг">
                                  <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Label>
-                              <ComboBox fx:id="gridSizeComboBox" editable="true" prefHeight="31.0" prefWidth="60.0">
-                                 <HBox.margin>
-                                    <Insets left="10.0" right="10.0" />
+                                    <Insets right="5.0" />
                                  </HBox.margin>
                               </ComboBox>
-                              <ToggleButton fx:id="gridToggle" mnemonicParsing="false" onAction="#drawImage" prefHeight="31.0" prefWidth="60.0" text="Сетка" />
                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER" opacity="0.74">
+                           <children>
+                              <ToggleButton fx:id="gridToggle" mnemonicParsing="false" prefHeight="31.0" prefWidth="176.0" text="Включить" />
+                           </children>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
                         </HBox>
                         <Separator prefWidth="200.0">
                            <VBox.margin>
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </Separator>
-                        <HBox alignment="CENTER" prefHeight="45.0" prefWidth="176.0">
+                        <HBox>
                            <children>
-                              <Label prefHeight="21.0" prefWidth="45.0" text="Size" />
-                              <Slider fx:id="scaleSlider" majorTickUnit="0.25" max="1.0" minorTickCount="10" onMouseDragOver="#onScaleChange" prefHeight="45.0" prefWidth="111.0" snapToTicks="true" value="1.0">
+                              <Label prefHeight="21.0" prefWidth="180.0" text="Размер" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="176.0">
+                           <children>
+                              <Slider fx:id="scaleSlider" majorTickUnit="0.25" max="1.0" minorTickCount="10" onMouseDragOver="#onScaleChange" prefHeight="31.0" prefWidth="122.0" snapToTicks="true" value="1.0" HBox.hgrow="ALWAYS">
                                  <cursor>
                                     <Cursor fx:constant="E_RESIZE" />
                                  </cursor>
                                  <padding>
                                     <Insets right="5.0" />
                                  </padding></Slider>
-                              <TextField fx:id="scaleField" prefHeight="31.0" prefWidth="54.0" />
+                              <TextField fx:id="scaleField" editable="false" prefHeight="31.0" prefWidth="48.0" text="1,00" />
                            </children>
                         </HBox>
+                        <Separator prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </content>
+          </TitledPane>
+          <TitledPane text="untitled 2">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
                         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <ImageView fx:id="cellView" fitHeight="150.0" fitWidth="200.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
+                              <Label text="Выбранная ячейка" />
+                              <ImageView fx:id="cellView" fitHeight="150.0" fitWidth="150.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" smooth="false" VBox.vgrow="NEVER">
                                  <image>
                                     <Image url="@../../../../../../../../../../Pictures/0%20-%205.jpg" />
                                  </image>
                               </ImageView>
+                              <Label fx:id="selectedCoordinateLabel" />
+                           </children>
+                        </VBox>
+                        <Separator prefWidth="200.0" />
+                        <VBox alignment="CENTER">
+                           <children>
+                              <Button fx:id="findButton" mnemonicParsing="false" text="Поиск" />
+                              <Button fx:id="closeButton" mnemonicParsing="false" text="Поиск" />
                            </children>
                         </VBox>
                      </children>
                   </VBox>
                </content>
-          </TitledPane>
-          <TitledPane animated="false" text="untitled 2">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
           </TitledPane>
           <TitledPane animated="false" text="untitled 3">
             <content>
@@ -118,4 +144,11 @@
         </panes>
       </Accordion>
    </left>
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="822.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="outLabel" text="Label" />
+         </children>
+      </HBox>
+   </bottom>
 </BorderPane>
