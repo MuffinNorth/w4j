@@ -7,13 +7,11 @@ img = Image.fromarray(img)
 in_pixels = dpi * 0.39 * field_size
 pix = img.load()
 bounds = getBounds(img, in_pixels)
-
-print(bounds)
-print(int(img.size[0] / in_pixels))
 matrix = list()
 clusters = list()
-for i in tqdm(range(int(img.size[0] / in_pixels)), position=0, desc="col", leave=False,):
+for i in tqdm(range(int(img.size[0] / in_pixels))):
     for j in range(int(img.size[1] / in_pixels)):
+        print(str(i))
         x1 = bounds[0] + i * in_pixels
         x2 = bounds[0] + i * in_pixels + in_pixels
         y1 = bounds[1] + j * in_pixels

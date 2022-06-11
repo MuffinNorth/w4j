@@ -1,0 +1,4 @@
+
+gpython:S1542"ORename function "getBounds" to match the regular expression ^[a-z_][a-z0-9_]*$.(“ещ 
+;python:S125R"Remove this commented out code.(Х™§ѓю€€€€
+fpython:S100T"ORename method "scaleMatrix" to match the regular expression ^[a-z_][a-z0-9_]*$.(М”г”

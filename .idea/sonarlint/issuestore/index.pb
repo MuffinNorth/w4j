@@ -31,3 +31,17 @@ f
 6src/main/java/ru/muffinnorth/w4j/HelloApplication.java,a\3\a3995f1f055e3f386cf62ee6bba30b24e663377f
 e
 5src/main/java/ru/muffinnorth/w4j/HelloController.java,3\1\31da32eb1678413ebd4067aeee3fb02202af8d11
+7
+pom.xml,4\4\442292b8a7efeabbe4cc176709b833b1792140ec
+g
+7src/main/java/ru/muffinnorth/w4j/model/CanvasModel.java,c\b\cbc88e24b39b9626ec8c01d12f8a4d6b6809628f
+f
+6src/main/java/ru/muffinnorth/w4j/controller/Cluster.py,3\d\3d39f0aa73f30000f8f517b1259b0a0f1ac276b1
+h
+8src/main/java/ru/muffinnorth/w4j/controller/NPanalyse.py,e\c\ec587a9d09546b53615207f2017c5ec67d1f8386
+c
+3src/main/java/ru/muffinnorth/w4j/model/Waffler.java,a\e\ae3ff9aa5a9bd0294c373dd8116ffb8bc2540808
+a
+1src/main/java/ru/muffinnorth/w4j/Application.java,5\e\5e5a3d021afe9ca84447ba91806c34886e5a9018
+o
+?src/main/java/ru/muffinnorth/w4j/controller/MainController.java,d\9\d9dea8503fce7eee6069e147e44ff8dc30cb0823

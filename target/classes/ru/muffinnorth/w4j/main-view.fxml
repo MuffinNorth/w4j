@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.effect.*?>
@@ -14,9 +15,12 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+          <Menu mnemonicParsing="false" text="Файл">
             <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
+              <MenuItem mnemonicParsing="false" text="Сохранить проект" />
+                  <MenuItem mnemonicParsing="false" text="Загрузить проект" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Выход" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
@@ -35,7 +39,7 @@
    <center>
       <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <content>
-            <VBox alignment="CENTER">
+            <VBox alignment="CENTER" style="-fx-background-color: gray;">
                <children>
                   <Canvas fx:id="canvas" height="136.0" width="136.0" />
                </children>
@@ -47,9 +51,9 @@
       </ScrollPane>
    </center>
    <left>
-      <Accordion minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
+      <Accordion minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: silver;" BorderPane.alignment="CENTER">
         <panes>
-          <TitledPane text="Обработка ">
+          <TitledPane expanded="false" text="Изображение">
                <content>
                   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
@@ -72,6 +76,7 @@
                                     <Insets right="5.0" />
                                  </HBox.margin>
                               </ComboBox>
+                              <Label prefHeight="21.0" prefWidth="37.0" text="мм" textAlignment="CENTER" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" opacity="0.74">
@@ -89,7 +94,7 @@
                         </Separator>
                         <HBox>
                            <children>
-                              <Label prefHeight="21.0" prefWidth="180.0" text="Размер" />
+                              <Label prefHeight="21.0" prefWidth="180.0" text="Размер:" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="176.0">
@@ -105,14 +110,74 @@
                            </children>
                         </HBox>
                         <Separator prefWidth="200.0" />
+                        <VBox>
+                           <children>
+                              <Label prefHeight="21.0" prefWidth="173.0" text="Padding:" />
+                              <ToggleButton fx:id="paddingToggle" mnemonicParsing="false" prefHeight="31.0" prefWidth="176.0" text="Включить">
+                                 <VBox.margin>
+                                    <Insets left="10.0" right="10.0" top="5.0" />
+                                 </VBox.margin>
+                              </ToggleButton>
+                              <HBox spacing="2.0">
+                                 <children>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Top" />
+                                          <TextField fx:id="topPadding" text="0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Left" />
+                                          <TextField fx:id="leftPadding" text="0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Bottom" />
+                                          <TextField fx:id="bottomPadding" text="0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Right" />
+                                          <TextField fx:id="rightPadding" text="0" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <Button fx:id="cropButton" mnemonicParsing="false" text="Crop" />
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </Separator>
                      </children>
                   </VBox>
                </content>
           </TitledPane>
-          <TitledPane text="untitled 2">
+          <TitledPane text="Ячейки">
                <content>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
+                        <VBox alignment="TOP_CENTER">
+                           <children>
+                              <Label minHeight="-Infinity" text="Репрезентативные области" textAlignment="CENTER" wrapText="true" />
+                              <Button fx:id="findButton" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="Поиск">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" top="2.0" />
+                                 </VBox.margin>
+                              </Button>
+                           </children>
+                        </VBox>
                         <Separator prefWidth="200.0" />
                         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                            <children>
@@ -126,9 +191,14 @@
                            </children>
                         </VBox>
                         <Separator prefWidth="200.0" />
+                        <VBox fx:id="histogramBox" alignment="CENTER" minHeight="200.0">
+                           <children>
+                              <Label text="Гистограмма оттенков" />
+                           </children>
+                        </VBox>
                         <VBox alignment="CENTER">
                            <children>
-                              <Button fx:id="findButton" mnemonicParsing="false" text="Поиск" />
+                              <Separator prefWidth="200.0" />
                               <Button fx:id="closeButton" mnemonicParsing="false" text="Поиск" />
                            </children>
                         </VBox>
@@ -136,7 +206,7 @@
                   </VBox>
                </content>
           </TitledPane>
-          <TitledPane animated="false" text="untitled 3">
+          <TitledPane text="Нейронная сеть">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
@@ -145,9 +215,22 @@
       </Accordion>
    </left>
    <bottom>
-      <HBox alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="822.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_RIGHT" opacity="0.5" prefHeight="28.0" prefWidth="822.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="outLabel" text="Label" />
+            <Label fx:id="outLabel" text="Последнее действие:">
+               <padding>
+                  <Insets right="5.0" />
+               </padding></Label>
+            <Label fx:id="outLabel1" text="None" underline="true">
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </Label>
+            <ProgressIndicator prefHeight="21.0" prefWidth="28.0">
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </ProgressIndicator>
          </children>
       </HBox>
    </bottom>

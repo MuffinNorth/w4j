@@ -1,0 +1,16 @@
+
+H
+java:S1199="-Extract this nested code block into a method.(ÒÌâ–øÿÿÿÿ
+˜
+java:S1186¿"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(ÚíŸı
+Q	java:S125K"<This block of commented-out lines of code should be removed.(ˆ‰Òœ
+Z
+java:S1134J"DTake the required action to fix the issue indicated by this comment.(÷Ã“
+S	java:S106b"9Replace this use of System.out or System.err by a logger.(¶ ‘­şÿÿÿÿ
+Z	java:S106u"9Replace this use of System.out or System.err by a logger.(ÍÈˆ÷ÿÿÿÿÿ8œ¿¸”0
+Z	java:S106~"9Replace this use of System.out or System.err by a logger.(–è·œıÿÿÿÿ8œ¿¸”0
+R
+java:S1128
+"5Remove this unused import 'javafx.scene.paint.Color'.(Ïî£à8û‚¹”0
+L
+java:S1128"*Remove this unused import 'jep.JepConfig'.(œĞ•‰ùÿÿÿÿ8û‚¹”0

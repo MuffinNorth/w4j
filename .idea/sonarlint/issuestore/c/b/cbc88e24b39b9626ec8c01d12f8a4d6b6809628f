@@ -1,0 +1,15 @@
+
+ƒ
+java:S1319"hThe type of "point2DS" should be an interface such as "List" rather than the implementation "ArrayList".(¶„ä²øÿÿÿÿ
+o
+java:S1104"TMake point2DS a static final constant or non-public and provide accessors if needed.(¶„ä²øÿÿÿÿ
+a
+java:S1134L"DTake the required action to fix the issue indicated by this comment.(÷Ã“8ÛÎö0
+a
+java:S1134Y"DTake the required action to fix the issue indicated by this comment.(÷Ã“8ê„Ÿö0
+S	java:S106_"9Replace this use of System.out or System.err by a logger.(—í³åùÿÿÿÿ
+Z	java:S106`"9Replace this use of System.out or System.err by a logger.(óë–¡øÿÿÿÿ8Ëıö0
+<
+java:S1452u"&Remove usage of generic wildcard type.(ŒËÁˆ
+H
+java:S1128"-Remove this unused import 'java.util.Arrays'.(î–˜Éüÿÿÿÿ

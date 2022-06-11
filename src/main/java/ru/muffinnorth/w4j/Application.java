@@ -10,8 +10,10 @@ public class Application extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 640, 480);
+        Scene scene = new Scene(fxmlLoader.load(), 860, 700);
         stage.setTitle("Wafflers");
+        stage.setMinHeight(700);
+        stage.setMinWidth(860);
         stage.setScene(scene);
         stage.show();
     }

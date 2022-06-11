@@ -8,24 +8,32 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.data.statistics.HistogramDataset;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Iterator;
+import java.util.PriorityQueue;
 
 public class CanvasModel {
     private Waffler waffler;
+    private CropModel cropModel;
     private double scale = 1.0;
     private boolean isNeedGrid = false;
     private double gridStep = 0.2;
     private Point2D selectedCell;
     private double blockSize = 1200 * 0.39 * gridStep;
+    private PriorityQueue<Cell> cells = new PriorityQueue<>();
+    private GraphicsContext context;
+    private int cellsToDraw = 15;
     private double[] bounds;
-
-    public ArrayList<Point2D> point2DS = new ArrayList<>();
 
 
     public CanvasModel(Image image){
         this.waffler = new Waffler(image);
+        this.cropModel = CropModel.getBaseCropModel();
         bounds = new double[]{
                 (image.getWidth() - (int)(image.getWidth() / blockSize) * blockSize) / 2,
                 (image.getHeight() - (int)(image.getHeight() / blockSize) * blockSize) / 2
@@ -34,6 +42,17 @@ public class CanvasModel {
 
     public Image getImage(){
         return waffler.getCurrentImage();
+    }
+
+    public void resizeImage(){
+        PixelReader reader = getImage().getPixelReader();
+        WritableImage newImage = new WritableImage(reader,
+                cropModel.getPadding()[0],
+                cropModel.getPadding()[1],
+                (int) (getImage().getWidth() - cropModel.getPadding()[2] - cropModel.getPadding()[1]),
+                (int) (getImage().getHeight() - cropModel.getPadding()[3] - cropModel.getPadding()[0]));
+        this.waffler = new Waffler(newImage);
+        setGridStep(20);
     }
 
     public double getWidth(){
@@ -64,51 +83,82 @@ public class CanvasModel {
         return scale;
     }
 
+
     public void draw(GraphicsContext context){
         context.save();
+        this.context = context;
+        internalDraw();
+        context.restore();
+    }
+
+    private void internalDraw(){
         context.scale(this.scale, this.scale);
-        context.drawImage(getImage(), 0, 0);
+        drawWafflerImage();
         if (isNeedGrid)
-            drawCells(context);
+            drawCells();
+        drawInteresting();
         if (selectedCell != null){
-            drawSelected(context);
+            drawSelected();
         }
-        drawInteresting(context);
-        context.restore();
+        drawPaddings();
     }
 
-    private void drawSelected(GraphicsContext context){
-        context.save();
-        context.setLineWidth(3);
-        context.setStroke(Color.ORANGE);
-        drawRect(context, (int) selectedCell.getX(), (int) selectedCell.getY(), bounds, blockSize, 5);
-        context.restore();
-    }
 
-    private void drawInteresting(GraphicsContext context){
+    private void drawPaddings(){
         context.save();
-        context.setLineWidth(5);
+        context.setLineWidth(10);
         context.setStroke(Color.RED);
-        point2DS.forEach(point2D -> {
-            System.out.println("draw this");
-            System.out.println(point2D);
-            drawRect(context, (int) point2D.getX(), (int) point2D.getY(), bounds, blockSize, 5);
-        });
+        int[] paddings = cropModel.getPadding();
+        context.strokeLine(paddings[1], paddings[0], getImage().getWidth() - paddings[2], paddings[0]);
+        context.strokeLine(paddings[1], getImage().getHeight() - paddings[3], getImage().getWidth() - paddings[2], getImage().getHeight() - paddings[3]);
+        context.strokeLine(paddings[1], paddings[0], paddings[1], getImage().getHeight() - paddings[3]);
+        context.strokeLine(getImage().getWidth() - paddings[2], paddings[0], getImage().getWidth() - paddings[2], getImage().getHeight() - paddings[3]);
         context.restore();
     }
 
-    private void drawCells(GraphicsContext context){
+    private void drawWafflerImage(){
+        context.drawImage(getImage(), 0, 0);
+    }
+
+    private void drawSelected(){
+        context.save();
+        Cell cell = Cell.builder().coordinate((int) selectedCell.getX(), (int) selectedCell.getY()).build();
+        drawCell(cell, Color.ORANGE, 3);
+        context.restore();
+    }
+
+    private void drawCell(Cell cell ,Color color, int width){
+        context.setLineWidth(width);
+        context.setStroke(color);
+        drawRect( (int) cell.getCoordinate().getX(), (int) cell.getCoordinate().getY(), bounds, blockSize, 5);
+    }
+
+    //FIXME
+    private void drawInteresting(){
+        context.save();
+        Iterator<Cell> iterator = cells.iterator();
+        for (int i = 0; i < cellsToDraw; i++) {
+            if(iterator.hasNext()){
+                Cell cell = iterator.next();
+                System.out.println("draw");
+                drawCell(cell, Color.RED, 5);
+            }
+        }
+        context.restore();
+    }
+
+    private void drawCells(){
         Image image = getImage();
         context.setLineWidth(2);
         context.setStroke(Color.BLACK);
         for (int i = 0; i < (image.getWidth() / blockSize) - 1; i++) {
             for (int j = 0; j < (image.getHeight() / blockSize) - 1; j++) {
-                drawRect(context, i, j, bounds, blockSize, 5);
+                drawRect(i, j, bounds, blockSize, 5);
             }
         }
     }
 
-    private void drawRect(GraphicsContext context, int x, int y, double[] bounds, double blockSize, double offset){
+    private void drawRect(int x, int y, double[] bounds, double blockSize, double offset){
         context.strokeRect(  bounds[0] + x*blockSize + offset, bounds[1] + y*blockSize + offset, blockSize - offset, blockSize - offset);
     }
 
@@ -137,4 +187,36 @@ public class CanvasModel {
         return selectedCell;
     }
 
+    public void appendCell(Cell c){
+        cells.add(c);
+    }
+
+    public JFreeChart createSelectedHist(){
+        if(selectedCell == null){
+            return null;
+        }
+        Image img = getSelectedImage();
+        ArrayList<Double> grayscale = new ArrayList<>();
+        PixelReader reader = img.getPixelReader();
+
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                int gray = (int)(reader.getColor(i, j).grayscale().getRed() * 255);
+                grayscale.add((double) gray);
+            }
+        }
+        double[] data = grayscale.stream().mapToDouble(i -> i).toArray();
+        HistogramDataset dataset = new HistogramDataset();
+        dataset.addSeries("key", data, 10);
+        JFreeChart chart = ChartFactory.createHistogram("Гистограмма оттенков", "Оттенки", "Кол-во", dataset);
+        ValueAxis domain = chart.getXYPlot().getDomainAxis();
+        domain.setRange(0, 255);
+        chart.removeLegend();
+        chart.clearSubtitles();
+        return chart;
+    }
+
+    public CropModel getCropModel() {
+        return cropModel;
+    }
 }
