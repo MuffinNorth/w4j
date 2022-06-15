@@ -8,6 +8,7 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import lombok.Getter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
@@ -15,18 +16,17 @@ import org.jfree.data.statistics.HistogramDataset;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.PriorityQueue;
 
 public class CanvasModel {
     private Waffler waffler;
     private CropModel cropModel;
     private double scale = 1.0;
     private boolean isNeedGrid = false;
-    private double gridStep = 0.2;
+    @Getter private double gridStep = 0.2;
     private Point2D selectedCell;
-    private double blockSize = 1200 * 0.39 * gridStep;
-    private PriorityQueue<Cell> cells = new PriorityQueue<>();
     private GraphicsContext context;
+    private double blockSize = 1200 * 0.39 * gridStep;
+    private final ArrayList<Cell> cells = new ArrayList<>();
     private int cellsToDraw = 15;
     private double[] bounds;
 
@@ -139,9 +139,7 @@ public class CanvasModel {
         Iterator<Cell> iterator = cells.iterator();
         for (int i = 0; i < cellsToDraw; i++) {
             if(iterator.hasNext()){
-                Cell cell = iterator.next();
-                System.out.println("draw");
-                drawCell(cell, Color.RED, 5);
+                drawCell(iterator.next(), Color.RED, 5);
             }
         }
         context.restore();
@@ -187,6 +185,10 @@ public class CanvasModel {
         return selectedCell;
     }
 
+    public void setSelectedCell(Cell cell){
+        selectedCell = cell.getCoordinate();
+    }
+
     public void appendCell(Cell c){
         cells.add(c);
     }
@@ -218,5 +220,10 @@ public class CanvasModel {
 
     public CropModel getCropModel() {
         return cropModel;
+    }
+
+
+    public ArrayList<Cell> getCells() {
+        return cells;
     }
 }

@@ -3,7 +3,6 @@ package ru.muffinnorth.w4j;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import ru.muffinnorth.w4j.HelloApplication;
 
 public class Application extends javafx.application.Application {
 
@@ -16,6 +15,7 @@ public class Application extends javafx.application.Application {
         stage.setMinWidth(860);
         stage.setScene(scene);
         stage.show();
+
     }
 
     public static void main(String[] args) {

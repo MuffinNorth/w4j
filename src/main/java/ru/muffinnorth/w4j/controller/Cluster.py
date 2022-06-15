@@ -10,6 +10,7 @@ bounds = getBounds(img, in_pixels)
 matrix = list()
 clusters = list()
 for i in tqdm(range(int(img.size[0] / in_pixels))):
+    print(i);
     for j in range(int(img.size[1] / in_pixels)):
         print(str(i))
         x1 = bounds[0] + i * in_pixels

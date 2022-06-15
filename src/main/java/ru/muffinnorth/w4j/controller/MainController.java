@@ -1,28 +1,24 @@
 package ru.muffinnorth.w4j.controller;
 
-import com.google.common.primitives.Ints;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jep.Interpreter;
-import jep.NDArray;
-import jep.SharedInterpreter;
 import org.jfree.chart.fx.ChartViewer;
 import ru.muffinnorth.w4j.listeners.ChangeTargetListener;
 import ru.muffinnorth.w4j.model.CanvasModel;
-import ru.muffinnorth.w4j.model.Cell;
 import ru.muffinnorth.w4j.model.CropModel;
+import ru.muffinnorth.w4j.model.NumberCell;
+import ru.muffinnorth.w4j.util.DualStream;
+import ru.muffinnorth.w4j.util.TextAreaOutputStream;
 
-import java.io.*;
-import java.util.Optional;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
 
 public class MainController {
 
@@ -80,16 +76,30 @@ public class MainController {
     @FXML
     Button cropButton;
 
+    @FXML
+    ListView<NumberCell> cellsView;
+
+    @FXML
+    TextArea out;
+
     private CanvasModel model;
 
     @FXML
     private void onClickLoadButton() {
+        ByteArrayOutputStream b = new TextAreaOutputStream(out);
+        PrintStream out = new PrintStream(b);
+        DualStream dualStream = new DualStream(System.out, out);
+        System.setOut(dualStream);
+        System.setErr(dualStream);
+        System.out.println("Start");
+
+
         {
             Stage thisStage = (Stage) loadButton.getScene().getWindow();
             FileChooser filechooser = new FileChooser();
             filechooser.setTitle("Open File");
             File selected = filechooser.showOpenDialog(thisStage);
-            if(selected == null){
+            if (selected == null) {
                 new Alert(Alert.AlertType.ERROR, "Не выбрано изображение").showAndWait();
                 return;
             }
@@ -100,72 +110,6 @@ public class MainController {
         init();
         connectListener();
         draw();
-
-
-        //FIXME
-        /*findButton.setOnAction(actionEvent -> {
-            try(Interpreter interpreter = new SharedInterpreter()){
-                PixelReader reader = model.getImage().getPixelReader();
-                int[] pixels = new int[(int) (model.getImage().getHeight()*model.getImage().getWidth())];
-                int i = 0;
-                for (int x = 0; x < model.getImage().getWidth(); x++) {
-                    for (int y = 0; y < model.getImage().getHeight(); y++) {
-                        pixels[i] = (int) (reader.getColor(x, y).grayscale().getRed()*255);
-                        i++;
-                    }
-                }
-                System.out.println(Arrays.toString(pixels));
-                NDArray<int[]> nd = new NDArray<>(pixels, (int)model.getImage().getWidth(), (int)model.getImage().getHeight());
-                interpreter.set("inp", nd);
-                System.out.println(interpreter.getValue("inp.shape"));
-            }
-        });*/
-
-        findButton.setOnAction(actionEvent -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setHeaderText("Внимание!");
-            alert.getDialogPane().setContent(new Label("Функция поиска репрезентативных областей может выполняться продолжительное время. Длительность операции зависит от размера шага и разрешения исходного изображения. "));
-            alert.showAndWait();
-            System.out.println("run thread");
-            try (Interpreter pyInterp = new SharedInterpreter()) {
-                File npAnalyser = new File("src/main/java/ru/muffinnorth/w4j/controller/NPanalyse.py");
-                File cluster = new File("src/main/java/ru/muffinnorth/w4j/controller/Cluster.py");
-                pyInterp.runScript(npAnalyser.getAbsolutePath());
-                pyInterp.exec("field_size = 0.2");
-                pyInterp.exec("dpi = 1200");
-
-                PixelReader reader = model.getImage().getPixelReader();
-                int[] pixels = new int[(int) (model.getImage().getHeight() * model.getImage().getWidth())];
-                int i = 0;
-                for (int x = 0; x < model.getImage().getWidth(); x++) {
-                    for (int y = 0; y < model.getImage().getHeight(); y++) {
-                        pixels[i] = (int) (reader.getColor(x, y).grayscale().getRed() * 255);
-                        i++;
-                    }
-                }
-                NDArray<int[]> nd = new NDArray<>(pixels, (int) model.getImage().getWidth(), (int) model.getImage().getHeight());
-                pyInterp.set("img", nd);
-                System.out.println("run analyse");
-                pyInterp.runScript(cluster.getAbsolutePath());
-                Long count = (Long) pyInterp.getValue("len(clusters)");
-                for (int j = 0; j < count.intValue(); j++) {
-                    System.out.printf("Collect %d cell%n", j);
-                    pyInterp.exec("cell = clusters[%d]".formatted(j));
-                    Long y = (Long) pyInterp.getValue("cell.x");
-                    Long x = (Long) pyInterp.getValue("cell.y");
-                    Long n = (Long) pyInterp.getValue("cell.cluster");
-                    Cell cell = Cell.builder()
-                            .clusterCount(n.intValue())
-                            .coordinate(x.intValue(), y.intValue())
-                            .build();
-                    model.appendCell(cell);
-                }
-                draw();
-            }
-            closeButton.setOnAction(actionEvent1 -> {
-            });
-        });
-
     }
 
     private void unlockAll() {
@@ -215,7 +159,7 @@ public class MainController {
 
         topPadding.textProperty().addListener(new ChangeTargetListener(integer -> {
             CropModel cropModel = model.getCropModel();
-            if(integer <= model.getImage().getHeight() - cropModel.getPadding()[3]){
+            if (integer <= model.getImage().getHeight() - cropModel.getPadding()[3]) {
                 cropModel.setTopPadding(integer);
                 draw();
             }
@@ -223,7 +167,7 @@ public class MainController {
 
         bottomPadding.textProperty().addListener(new ChangeTargetListener(integer -> {
             CropModel cropModel = model.getCropModel();
-            if(integer <= model.getImage().getHeight() - cropModel.getPadding()[0]){
+            if (integer <= model.getImage().getHeight() - cropModel.getPadding()[0]) {
                 cropModel.setBottomPadding(integer);
                 draw();
             }
@@ -231,7 +175,7 @@ public class MainController {
 
         leftPadding.textProperty().addListener(new ChangeTargetListener(integer -> {
             CropModel cropModel = model.getCropModel();
-            if(integer <= model.getImage().getWidth() - cropModel.getPadding()[2]){
+            if (integer <= model.getImage().getWidth() - cropModel.getPadding()[2]) {
                 cropModel.setLeftPadding(integer);
                 draw();
             }
@@ -239,7 +183,7 @@ public class MainController {
 
         rightPadding.textProperty().addListener(new ChangeTargetListener(integer -> {
             CropModel cropModel = model.getCropModel();
-            if(integer <= model.getImage().getWidth() - cropModel.getPadding()[1]){
+            if (integer <= model.getImage().getWidth() - cropModel.getPadding()[1]) {
                 cropModel.setRightPadding(integer);
                 draw();
             }
@@ -247,11 +191,24 @@ public class MainController {
 
         cropButton.setOnAction(actionEvent -> {
             model.resizeImage();
+            prepare();
+            init();
             draw();
         });
+
+        findButton.setOnAction(NPAnalyzer.builder().model(model).outList(model.getCells()).callback(cells -> {
+            cells.forEach(cell -> cellsView.getItems().add(new NumberCell(cell, cells.indexOf(cell))));
+            cellsView.getSelectionModel().selectedItemProperty().addListener((observableValue, numberCell, t1) -> {
+                System.out.println(t1);
+                model.setSelectedCell(t1.getCell());
+                draw();
+            });
+            draw();
+        }).build().actionEvent());
     }
 
     private void prepare() {
+        cellsView.getItems().clear();
         topPadding.setText("0");
         leftPadding.setText("0");
         rightPadding.setText("0");
@@ -265,6 +222,7 @@ public class MainController {
     }
 
     private void init() {
+
         model.setGridStep(
                 Double.parseDouble(gridSizeComboBox.getSelectionModel().getSelectedItem())
         );

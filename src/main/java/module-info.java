@@ -5,6 +5,7 @@ module ru.muffinnorth.w4j {
     requires jfreechart.fx;
     requires jfreechart;
     requires com.google.common;
+    requires lombok;
 
     opens ru.muffinnorth.w4j to javafx.fxml;
     exports ru.muffinnorth.w4j;

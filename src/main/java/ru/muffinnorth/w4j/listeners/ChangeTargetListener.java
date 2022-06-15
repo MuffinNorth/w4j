@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public class ChangeTargetListener implements ChangeListener<String> {
 
-    private Consumer<Integer> callback;
+    private final Consumer<Integer> callback;
 
     public ChangeTargetListener(Consumer<Integer> callback){
         this.callback = callback;

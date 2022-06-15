@@ -1,9 +1,9 @@
 package ru.muffinnorth.w4j.model;
 
 import javafx.geometry.Point2D;
+import lombok.Getter;
 
 public class Cell implements Comparable<Cell>{
-
 
     private Point2D coordinate;
     private int clusterCount;
@@ -41,5 +41,11 @@ public class Cell implements Comparable<Cell>{
 
     public Point2D getCoordinate() {
         return coordinate;
+    }
+
+    @Override
+    public String toString() {
+        return "c = " + coordinate.getX() + ":" + coordinate.getY() +
+                ", l =" + clusterCount;
     }
 }
