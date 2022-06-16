@@ -17,7 +17,7 @@ import org.jfree.data.statistics.HistogramDataset;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class CanvasModel {
+public class CanvasModel{
     private Waffler waffler;
     private CropModel cropModel;
     private double scale = 1.0;

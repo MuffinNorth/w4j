@@ -14,8 +14,8 @@
         <menus>
           <Menu mnemonicParsing="false" text="Файл">
             <items>
-              <MenuItem mnemonicParsing="false" text="Сохранить проект" />
-                  <MenuItem mnemonicParsing="false" text="Загрузить проект" />
+              <MenuItem mnemonicParsing="false" onAction="#saveProject" text="Сохранить проект" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadProject" text="Загрузить проект" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Выход" />
             </items>

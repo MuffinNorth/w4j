@@ -13,12 +13,10 @@ import ru.muffinnorth.w4j.listeners.ChangeTargetListener;
 import ru.muffinnorth.w4j.model.CanvasModel;
 import ru.muffinnorth.w4j.model.CropModel;
 import ru.muffinnorth.w4j.model.NumberCell;
-import ru.muffinnorth.w4j.util.DualStream;
 import ru.muffinnorth.w4j.util.TextAreaOutputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
 
 public class MainController {
 
@@ -90,13 +88,11 @@ public class MainController {
     @FXML
     private void onClickLoadButton() {
         ByteArrayOutputStream b = new TextAreaOutputStream(out);
-        PrintStream out = new PrintStream(b);
+        /*PrintStream out = new PrintStream(b);
         DualStream dualStream = new DualStream(System.out, out);
         System.setOut(dualStream);
-        System.setErr(dualStream);
+        System.setErr(dualStream);*/
         System.out.println("Start");
-
-
         {
             Stage thisStage = (Stage) loadButton.getScene().getWindow();
             FileChooser filechooser = new FileChooser();
@@ -242,5 +238,13 @@ public class MainController {
 
     @FXML
     private void onScaleChange() {
+    }
+
+    @FXML
+    private void saveProject(){
+    }
+
+    @FXML
+    private void loadProject(){
     }
 }
