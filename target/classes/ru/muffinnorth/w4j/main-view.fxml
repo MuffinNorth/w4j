@@ -252,7 +252,7 @@
                         </VBox>
                      </center>
                      <bottom>
-                        <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="202.0" text="Применить к пластине" BorderPane.alignment="CENTER" />
+                        <Button fx:id="applyNeuro" mnemonicParsing="false" prefHeight="31.0" prefWidth="202.0" text="Применить к пластине" BorderPane.alignment="CENTER" />
                      </bottom>
                   </BorderPane>
                </content>

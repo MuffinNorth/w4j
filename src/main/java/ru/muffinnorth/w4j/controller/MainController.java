@@ -82,6 +82,9 @@ public class MainController {
     @FXML
     TextArea out;
 
+    @FXML
+    Button applyNeuro;
+
     private CanvasModel model;
 
     @FXML
@@ -205,6 +208,8 @@ public class MainController {
             });
             draw();
         }).build().actionEvent());
+
+        applyNeuro.setOnAction(Applyer.builder().model(model).build().actionEvent());
     }
 
     private void prepare() {

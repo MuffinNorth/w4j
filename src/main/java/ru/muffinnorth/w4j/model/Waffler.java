@@ -27,5 +27,9 @@ public class Waffler {
         return currentImage;
     }
 
+    public Image getOriginalImage(){
+        return currentImage;
+    }
+
 
 }

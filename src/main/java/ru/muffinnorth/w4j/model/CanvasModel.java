@@ -44,6 +44,10 @@ public class CanvasModel {
         return waffler.getCurrentImage();
     }
 
+    public Image getOriginal(){
+        return waffler.getOriginalImage();
+    }
+
     public void resizeImage(){
         PixelReader reader = getImage().getPixelReader();
         WritableImage newImage = new WritableImage(reader,
