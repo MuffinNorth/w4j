@@ -105,7 +105,7 @@
                         <Separator prefWidth="200.0" />
                         <VBox>
                            <children>
-                              <Label prefHeight="21.0" prefWidth="173.0" text="Padding:" />
+                              <Label prefHeight="21.0" prefWidth="173.0" text="Края:" />
                               <ToggleButton fx:id="paddingToggle" mnemonicParsing="false" prefHeight="31.0" prefWidth="176.0" text="Включить">
                                  <VBox.margin>
                                     <Insets left="10.0" right="10.0" top="5.0" />
@@ -113,27 +113,27 @@
                               </ToggleButton>
                               <HBox spacing="2.0">
                                  <children>
-                                    <VBox>
+                                    <VBox alignment="TOP_CENTER">
                                        <children>
-                                          <Label text="Top" />
+                                          <Label text="Верхняя" />
                                           <TextField fx:id="topPadding" text="0" />
                                        </children>
                                     </VBox>
-                                    <VBox>
+                                    <VBox alignment="TOP_CENTER">
                                        <children>
-                                          <Label text="Left" />
+                                          <Label text="Левая" />
                                           <TextField fx:id="leftPadding" text="0" />
                                        </children>
                                     </VBox>
-                                    <VBox>
+                                    <VBox alignment="TOP_CENTER">
                                        <children>
-                                          <Label text="Bottom" />
+                                          <Label text="Нижняя" />
                                           <TextField fx:id="bottomPadding" text="0" />
                                        </children>
                                     </VBox>
-                                    <VBox>
+                                    <VBox alignment="TOP_CENTER">
                                        <children>
-                                          <Label text="Right" />
+                                          <Label text="Правая" />
                                           <TextField fx:id="rightPadding" text="0" />
                                        </children>
                                     </VBox>
@@ -144,7 +144,7 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <Button fx:id="cropButton" mnemonicParsing="false" text="Crop" />
+                        <Button fx:id="cropButton" mnemonicParsing="false" text="Уточнить края" />
                         <Separator prefWidth="200.0">
                            <VBox.margin>
                               <Insets />
@@ -213,15 +213,15 @@
                               <VBox>
                                  <children>
                                     <Label text="Модель:" />
-                                    <TextField prefHeight="31.0" prefWidth="70.0" promptText="Путь до модели">
+                                    <TextField fx:id="modelPathEdit" prefHeight="31.0" prefWidth="70.0" promptText="Путь до модели">
                                        <VBox.margin>
                                           <Insets bottom="5.0" />
                                        </VBox.margin>
                                     </TextField>
                                     <HBox alignment="CENTER" spacing="5.0">
                                        <children>
-                                          <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="103.0" text="Сохранить" />
-                                          <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="109.0" text="Открыть" />
+                                          <Button mnemonicParsing="false" onAction="#saveModel" prefHeight="31.0" prefWidth="103.0" text="Сохранить" />
+                                          <Button mnemonicParsing="false" onAction="#loadModel" prefHeight="31.0" prefWidth="109.0" text="Открыть" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -233,14 +233,22 @@
                               <VBox>
                                  <children>
                                     <Label text="Обучающие данные:" />
-                                    <TextField prefHeight="31.0" prefWidth="70.0" promptText="Путь до папки с данными">
+                                    <HBox spacing="5.0">
+                                       <children>
+                                          <TextField fx:id="trainPathField" promptText="Путь до папки с данными">
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Button mnemonicParsing="false" onAction="#loadTrainModel" prefWidth="128.0" text="Выбрать" />
+                                       </children>
                                        <VBox.margin>
                                           <Insets bottom="5.0" />
                                        </VBox.margin>
-                                    </TextField>
+                                    </HBox>
                                     <HBox alignment="CENTER" spacing="5.0">
                                        <children>
-                                          <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="193.0" text="Обучить" />
+                                          <Button mnemonicParsing="false" onAction="#trainModel" prefHeight="31.0" prefWidth="193.0" text="Обучить" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -252,7 +260,18 @@
                         </VBox>
                      </center>
                      <bottom>
-                        <Button fx:id="applyNeuro" mnemonicParsing="false" prefHeight="31.0" prefWidth="202.0" text="Применить к пластине" BorderPane.alignment="CENTER" />
+                        <VBox alignment="TOP_CENTER" spacing="5.0">
+                           <children>
+                              <Button fx:id="toggleBackground" mnemonicParsing="false" prefHeight="31.0" prefWidth="218.0" text="Переключить вид" />
+                              <HBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Slider fx:id="neuroScaleSlider" blockIncrement="1.0" min="1.0" value="100.0" />
+                                    <TextField fx:id="neuroScaleField" editable="false" prefHeight="31.0" prefWidth="41.0" text="100%" />
+                                 </children>
+                              </HBox>
+                              <Button fx:id="applyNeuro" mnemonicParsing="false" prefHeight="31.0" prefWidth="202.0" text="Применить к пластине" BorderPane.alignment="CENTER" />
+                           </children>
+                        </VBox>
                      </bottom>
                   </BorderPane>
                </content>

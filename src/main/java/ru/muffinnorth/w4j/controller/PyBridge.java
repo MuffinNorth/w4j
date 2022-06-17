@@ -12,7 +12,6 @@ public abstract class PyBridge {
 
     public PyBridge(){
         JepConfig config = new JepConfig();
-        System.out.println("set config");
         config.redirectStdout(System.out);
         SharedInterpreter.setConfig(config);
     }

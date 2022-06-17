@@ -9,6 +9,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import lombok.Getter;
+import lombok.Setter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
@@ -22,6 +23,8 @@ public class CanvasModel{
     private CropModel cropModel;
     private double scale = 1.0;
     private boolean isNeedGrid = false;
+    @Getter @Setter
+    private boolean isNeedCropLines = false;
     @Getter private double gridStep = 0.2;
     private Point2D selectedCell;
     private GraphicsContext context;
@@ -104,7 +107,9 @@ public class CanvasModel{
         if (selectedCell != null){
             drawSelected();
         }
-        drawPaddings();
+        if (isNeedCropLines){
+            drawPaddings();
+        }
     }
 
 
@@ -229,5 +234,13 @@ public class CanvasModel{
 
     public ArrayList<Cell> getCells() {
         return cells;
+    }
+
+    public void setBackgroundWaffler(Image image){
+        waffler.setColoredImage(image);
+    }
+
+    public void switchOriginImage(){
+        waffler.setSwitch(!waffler.getSwitch());
     }
 }

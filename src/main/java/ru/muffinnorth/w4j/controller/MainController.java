@@ -1,22 +1,28 @@
 package ru.muffinnorth.w4j.controller;
 
+import com.google.common.io.Files;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.jfree.chart.fx.ChartViewer;
 import ru.muffinnorth.w4j.listeners.ChangeTargetListener;
 import ru.muffinnorth.w4j.model.CanvasModel;
 import ru.muffinnorth.w4j.model.CropModel;
+import ru.muffinnorth.w4j.model.NeuroModel;
 import ru.muffinnorth.w4j.model.NumberCell;
+import ru.muffinnorth.w4j.util.DualStream;
 import ru.muffinnorth.w4j.util.TextAreaOutputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
+import java.util.Optional;
 
 public class MainController {
 
@@ -81,17 +87,33 @@ public class MainController {
     TextArea out;
 
     @FXML
+    TextField modelPathEdit;
+
+    @FXML
     Button applyNeuro;
 
+    @FXML
+    Slider neuroScaleSlider;
+
+    @FXML
+    TextField neuroScaleField;
+
+    @FXML
+    Button toggleBackground;
+
+    @FXML
+    TextField trainPathField;
+
     private CanvasModel model;
+    private NeuroModel neuroModel = new NeuroModel();
 
     @FXML
     private void onClickLoadButton() {
         ByteArrayOutputStream b = new TextAreaOutputStream(out);
-        /*PrintStream out = new PrintStream(b);
+        PrintStream out = new PrintStream(b);
         DualStream dualStream = new DualStream(System.out, out);
         System.setOut(dualStream);
-        System.setErr(dualStream);*/
+        System.setErr(dualStream);
         System.out.println("Start");
         {
             Stage thisStage = (Stage) loadButton.getScene().getWindow();
@@ -190,6 +212,7 @@ public class MainController {
 
         cropButton.setOnAction(actionEvent -> {
             model.resizeImage();
+            draw();
             prepare();
             init();
             draw();
@@ -205,7 +228,26 @@ public class MainController {
             draw();
         }).build().actionEvent());
 
-        applyNeuro.setOnAction(Applyer.builder().model(model).build().actionEvent());
+        neuroScaleSlider.valueProperty().addListener((observableValue, old_num, new_num) -> {
+            neuroScaleField.setText(String.valueOf(new_num.intValue())  + "%");
+            neuroModel.setScale(new_num.doubleValue() / 100);
+        });
+
+        applyNeuro.setOnAction(Applyer.builder().model(model).neuroModel(neuroModel).callback(() -> {
+            model.switchOriginImage();
+            draw();
+        }).build().actionEvent());
+
+        toggleBackground.setOnAction(actionEvent -> {
+            System.out.println("change");
+            model.switchOriginImage();
+            draw();
+        });
+
+        paddingToggle.setOnAction(actionEvent -> {
+            model.setNeedCropLines(paddingToggle.isSelected());
+            draw();
+        });
     }
 
     private void prepare() {
@@ -247,4 +289,57 @@ public class MainController {
     @FXML
     private void loadProject(){
     }
+
+    @FXML
+    private void loadModel(){
+        Stage thisStage = (Stage) loadButton.getScene().getWindow();
+        FileChooser filechooser = new FileChooser();
+        filechooser.setTitle("Open model file");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("H5 files (*.h5)", "*.h5");
+        filechooser.setSelectedExtensionFilter(extFilter);
+        Optional<File> selected = Optional.ofNullable(filechooser.showOpenDialog(thisStage));
+        selected.ifPresentOrElse(file -> {
+            if(!Files.getFileExtension(file.getName()).equals("h5"))
+                return;
+            neuroModel.setModelWeight(file.getAbsolutePath());
+            modelPathEdit.setText(file.getAbsolutePath());
+        }, () -> {
+            System.out.println("Blank file");
+        });
+    }
+
+    @FXML
+    private void saveModel(){
+        Stage thisStage = (Stage) loadButton.getScene().getWindow();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("H5 files (*.h5)", "*.h5");
+        FileChooser filechooser = new FileChooser();
+        filechooser.setInitialFileName("model.h5");
+        filechooser.setTitle("Open model file");
+        Optional<File> selected = Optional.ofNullable(filechooser.showSaveDialog(thisStage));
+        selected.ifPresentOrElse(file -> {
+            if(!Files.getFileExtension(file.getName()).equals("h5"))
+                return;
+
+            modelPathEdit.setText(file.getAbsolutePath());
+        }, () -> {
+            System.out.println("Blank file");
+        });
+    }
+
+    @FXML
+    private void trainModel(){
+        new Alert(Alert.AlertType.ERROR, "Not implementing yet").showAndWait();
+    }
+
+    @FXML
+    private void loadTrainModel(){
+        Stage thisStage = (Stage) loadButton.getScene().getWindow();
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Choose train dialog");
+        Optional<File> selected = Optional.ofNullable(chooser.showDialog(thisStage));
+        selected.ifPresent(file -> {
+            trainPathField.setText(file.getAbsolutePath());
+        });
+    }
+
 }

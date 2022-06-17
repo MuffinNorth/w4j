@@ -31,5 +31,9 @@ public class Waffler {
         return currentImage;
     }
 
+    public boolean getSwitch(){
+        return switchImage;
+    }
+
 
 }
